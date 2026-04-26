@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRACO LIBRARY</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="showView('home')">DRACO<span> LIBRARY</span><small>BY DRACO iNC &middot; A DRACO DYNASTY TECHNOLOGY DEPARTMENT</small></div>
+  <div class="nav-links">
+    <button onclick="showView('home')">Home</button>
+    <button onclick="showView('browse')">Browse</button>
+    <button onclick="showView('mylibrary')">My Library<span class="lib-badge" id="lib-badge">0</span></button>
+  </div>
+  <div class="nav-right">
+    <button class="btn-signin">Sign In</button>
+    <button class="btn-browse" onclick="showView('browse')">Browse Books</button>
+  </div>
+</nav>
+
+<div class="view active" id="view-home">
+  <section class="hero">
+    <div class="hero-bg"><div id="bg-hero"></div></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow fu">Knowledge &middot; Faith &middot; Growth</div>
+      <h1 class="hero-title fu fu1">Every great book.<br><em>One platform.</em></h1>
+      <p class="hero-sub fu fu2">Browse Christian materials, inspirational content, and educational resources. Read Chapter 1 free &mdash; unlock the full book when you&rsquo;re ready.</p>
+      <div class="hero-actions fu fu3">
+        <button class="btn-primary" onclick="showView('browse')">Start Reading Free</button>
+        <button class="btn-outline" onclick="showDetail('basic-christianity')">See a Book</button>
+      </div>
+      <div class="hero-stats fu fu4">
+        <div><div class="stat-num">8</div><div class="stat-label">Books Available</div></div>
+        <div><div class="stat-num">Free</div><div class="stat-label">Full Chapter 1</div></div>
+        <div><div class="stat-num">PDF</div><div class="stat-label">Download on Purchase</div></div>
+        <div><div class="stat-num">AI</div><div class="stat-label">Audio Narration</div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="section-header"><div class="section-tag">Featured Books</div><h2 class="section-title">Start <em>reading</em> today</h2></div>
+    <div class="books-grid" id="home-grid"></div>
+  </section>
+  <hr class="divider">
+  <section class="section">
+    <div class="section-header"><div class="section-tag">How It Works</div><h2 class="section-title">Read, listen, own &mdash; on your <em>terms</em></h2></div>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">01</div><div class="step-title">Browse &amp; Preview</div><p class="step-desc">Every book opens with the full Chapter 1 — word for word, styled like the original. No account. No payment.</p></div>
+      <div class="step-card"><div class="step-num">02</div><div class="step-title">Unlock Full Access</div><p class="step-desc">Pay once. The full book is yours forever &mdash; read online on any device, any time.</p></div>
+      <div class="step-card"><div class="step-num">03</div><div class="step-title">Download PDF</div><p class="step-desc">Every purchase includes a PDF download. Read offline, save to your device, keep it permanently.</p></div>
+      <div class="step-card"><div class="step-num">04</div><div class="step-badge">PHASE 2 &mdash; LIVE</div><div class="step-title">AI Audio Narration</div><p class="step-desc">6 AI voices. 5 speeds. Word-by-word tracking. Every book becomes a listenable audiobook instantly.</p></div>
+    </div>
+  </section>
+  <hr class="divider">
+  <section class="section">
+    <div class="section-header"><div class="section-tag">Browse by Category</div><h2 class="section-title">Find your next <em>read</em></h2></div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#10013;&#65039;</div><div class="cat-name">Christian Materials</div><div class="cat-count">4 books</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#128293;</div><div class="cat-name">Inspirational Content</div><div class="cat-count">4 books</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#128218;</div><div class="cat-name">Educational Materials</div><div class="cat-count">Coming soon</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#127891;</div><div class="cat-name">CBE Curriculum</div><div class="cat-count">Coming soon</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#128214;</div><div class="cat-name">Bible Study</div><div class="cat-count">4 books</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#129504;</div><div class="cat-name">Personal Development</div><div class="cat-count">3 books</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#128176;</div><div class="cat-name">Finance &amp; Wealth</div><div class="cat-count">1 book</div></div>
+      <div class="cat-card" onclick="showView('browse')"><div class="cat-icon">&#128104;&#8205;&#127979;</div><div class="cat-name">Teacher Resources</div><div class="cat-count">Coming soon</div></div>
+    </div>
+  </section>
+  <footer>
+    <div><div class="footer-logo">DRACO <span>LIBRARY</span></div><div class="footer-tag">BY DRACO iNC &middot; A DRACO DYNASTY TECHNOLOGY DEPARTMENT</div></div>
+    <div class="footer-links"><a onclick="void(0)">About</a><a onclick="void(0)">Contact</a><a onclick="void(0)">Terms</a></div>
+    <div class="footer-copy">&copy; 2026 DRACO iNC &middot; Nairobi, Kenya</div>
+  </footer>
+</div>
+
+<div class="view" id="view-browse">
+  <div class="browse-page">
+    <div class="browse-bg"><div id="bg-browse"></div><div class="browse-bg-overlay"></div></div>
+    <div class="browse-layout">
+      <aside class="sidebar">
+        <input class="search-box" placeholder="Search books or authors..." oninput="filterBooks(this.value)">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Category</div>
+          <button class="filter-btn active" onclick="setFilter('all',this)"><span class="fdot"></span>All Books</button>
+          <button class="filter-btn" onclick="setFilter('christian',this)"><span class="fdot"></span>Christian Materials</button>
+          <button class="filter-btn" onclick="setFilter('inspirational',this)"><span class="fdot"></span>Inspirational Content</button>
+          <button class="filter-btn" onclick="setFilter('educational',this)"><span class="fdot"></span>Educational Materials</button>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">Access</div>
+          <button class="filter-btn active" onclick="setPriceFilter('all',this)"><span class="fdot"></span>All</button>
+          <button class="filter-btn" onclick="setPriceFilter('owned',this)"><span class="fdot"></span>My Books</button>
+          <button class="filter-btn" onclick="setPriceFilter('paid',this)"><span class="fdot"></span>Not Yet Owned</button>
+        </div>
+      </aside>
+      <main>
+        <div class="browse-header">
+          <div><h1 class="browse-title">All Books</h1><div class="results-count" id="results-count">Showing 8 books</div></div>
+          <select class="sort-sel"><option>Sort: Popular</option><option>Sort: Price Low</option><option>Sort: Price High</option></select>
+        </div>
+        <div class="books-grid" id="browse-grid"></div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-mylibrary">
+  <div class="mylib-view">
+    <div class="mylib-bg"><div id="bg-mylib"></div><div class="mylib-bg-overlay"></div></div>
+    <div class="mylib-content">
+      <div class="mylib-tag">Your Collection</div>
+      <h1 class="mylib-title">My Library</h1>
+      <p class="mylib-sub" id="mylib-sub">Books you purchase appear here.</p>
+      <div id="library-grid"></div>
+      <div class="mylib-empty" id="library-empty" style="display:none">
+        <div class="empty-icon">&#128214;</div>
+        <h2 class="empty-title">Your library is empty</h2>
+        <p class="empty-sub">Browse the catalogue and unlock your first book to get started.</p>
+        <button class="btn-primary" onclick="showView('browse')">Browse Books</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-detail">
+  <div class="detail-page">
+    <div class="detail-bg"><div id="bg-detail"></div><div class="detail-bg-overlay"></div></div>
+    <div class="detail-layout">
+      <div><div class="detail-cover" id="detail-cover"></div></div>
+      <div>
+        <div class="d-cat" id="d-cat"></div>
+        <h1 class="d-title" id="d-title"></h1>
+        <div class="d-author" id="d-author"></div>
+        <div class="d-meta">
+          <div class="meta-item"><span class="meta-label">Pages</span><span class="meta-val" id="d-pages"></span></div>
+          <div class="meta-item"><span class="meta-label">Year</span><span class="meta-val" id="d-year"></span></div>
+          <div class="meta-item"><span class="meta-label">Language</span><span class="meta-val">English</span></div>
+          <div class="meta-item"><span class="meta-label">Free Preview</span><span class="meta-val" style="color:var(--green)">Full Chapter 1</span></div>
+        </div>
+        <p class="d-desc" id="d-desc"></p>
+        <div class="price-box">
+          <div class="price-main" id="d-price"></div>
+          <div class="price-note">One-time payment. Yours forever.</div>
+          <ul class="price-features">
+            <li>Full book &mdash; every chapter, every page</li>
+            <li>Read online on any device, unlimited</li>
+            <li>Download PDF &mdash; read offline anytime</li>
+            <li>AI audio narration &mdash; 6 voices &amp; 5 speeds</li>
+          </ul>
+          <button class="btn-purchase" id="d-main-btn"></button>
+          <button class="btn-preview" id="d-preview-btn"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-reader">
+  <div class="reader-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="r-progress" style="width:0%"></div></div>
+    <div class="reader-toolbar">
+      <div class="rtitle" id="r-title"></div>
+      <div class="reader-controls">
+        <button class="rbtn" onclick="changeFontSize(-1)">A&minus;</button>
+        <button class="rbtn" onclick="changeFontSize(1)">A+</button>
+        <button class="rbtn" id="audio-toggle-btn" onclick="toggleAudio()">&#127911; Listen</button>
+        <button class="rbtn" id="dl-btn" onclick="handleDownload()">&darr; PDF</button>
+        <button class="rbtn" onclick="if(currentBook)showDetail(currentBook.id)">Info</button>
+        <button class="rbtn" onclick="showView('browse')">&larr; Library</button>
+      </div>
+    </div>
+    <div class="reader-body">
+      <div class="reader-toc"><div class="toc-head">Contents</div><div id="toc-list"></div></div>
+      <div class="reader-main">
+        <div class="reader-scroll"><div class="reader-content" id="reader-content"></div></div>
+        <div class="audio-panel" id="audio-panel">
+          <div class="audio-inner">
+            <div class="audio-header">
+              <div class="audio-title-row"><span class="pdot" id="pdot"></span> AI Audio Narration <span class="audio-tag">PHASE 2</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span class="audio-status-txt" id="audio-status">Ready</span><button class="audio-close-btn" onclick="closeAudio()">&#10005;</button></div>
+            </div>
+            <div class="audio-ctrls">
+              <button class="play-btn" id="play-btn" onclick="togglePlay()">&#9654;</button>
+              <div class="audio-tl"><input type="range" class="audio-track" id="audio-seek" min="0" max="100" value="0" oninput="seekAudio(this.value)"><div class="audio-time-row"><span id="a-current">0:00</span><span id="a-total">0:00</span></div></div>
+            </div>
+            <div class="audio-opts">
+              <div><span class="aopt-label">Voice</span>
+                <select class="asel" id="voice-select" onchange="changeVoice()">
+                  <option value="US-M">Marcus &mdash; Deep Male (US)</option>
+                  <option value="GB-M">James &mdash; British Male</option>
+                  <option value="US-F">Amara &mdash; Female (US)</option>
+                  <option value="GB-F">Sophia &mdash; British Female</option>
+                  <option value="AU-M">Noah &mdash; Australian</option>
+                  <option value="ZA-F">Thembi &mdash; South African</option>
+                </select>
+              </div>
+              <div><span class="aopt-label">Speed</span>
+                <select class="asel" id="speed-select" onchange="changeSpeed()">
+                  <option value="0.75">0.75&times;</option>
+                  <option value="1.0" selected>1.0&times;</option>
+                  <option value="1.25">1.25&times;</option>
+                  <option value="1.5">1.5&times;</option>
+                  <option value="2.0">2.0&times;</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-success">
+  <div class="success-wrap">
+    <div class="success-icon">&#10003;</div>
+    <h1 class="success-title">You're in.</h1>
+    <p class="success-desc"><strong id="s-title"></strong> is now fully unlocked. Read it online, download the PDF, or listen with AI narration.</p>
+    <div class="success-actions">
+      <button class="btn-primary" onclick="openReader(currentBook,true)">Read Now</button>
+      <button class="btn-outline" onclick="openReaderAudio()">&#127911; Listen Now</button>
+      <button class="btn-outline" onclick="handleDownload()">&darr; Download PDF</button>
+      <button class="btn-outline" onclick="showView('browse')">Browse More</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="checkout-modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeCheckout()">&#10005;</button>
+    <h2 class="modal-title">Unlock this book</h2>
+    <p class="modal-sub" id="modal-sub"></p>
+    <div class="modal-order" id="modal-order"></div>
+    <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" placeholder="your@email.com"></div>
+    <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" placeholder="Your name"></div>
+    <button class="btn-purchase" onclick="completeCheckout()">Complete Purchase</button>
+    <p class="modal-note">Secure checkout &middot; Instant access &middot; PDF + AI Audio included</p>
+  </div>
+</div>
+
+<!-- Load order matters: data → backgrounds → app -->
+<script src="js/data.js"></script>
+<script src="js/backgrounds.js"></script>
+<script src="js/app.js"></script>
+<script>
+// Inject SVG backgrounds after DOM is ready
+document.getElementById('bg-hero').innerHTML = SVG_HERO;
+document.getElementById('bg-browse').innerHTML = SVG_BROWSE;
+document.getElementById('bg-mylib').innerHTML = SVG_MYLIB;
+document.getElementById('bg-detail').innerHTML = SVG_DETAIL;
+</script>
+</body>
+</html>
