@@ -1,7 +1,7 @@
 [README.md](https://github.com/user-attachments/files/27103630/README.md)
-# DRACO LIBRARY — Michael Digital Library Platform
+# MICHAEL'S LIBRARY — Michael Digital Library Platform
 
-> Built by **DRACO iNC — A DRACO DYNASTY Technology Department**
+> Built by **DRACO iNC A DRACO DYNASTY Technology Department**
 > Nairobi, Kenya · 2026
 
 A full digital library platform serving students, teachers, and parents with educational materials, inspirational books, and Christian content. Chapter 1 of every book is free to read. Full access unlocked with a one-time purchase.
