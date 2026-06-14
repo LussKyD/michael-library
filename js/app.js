@@ -5,6 +5,7 @@
 
 
 var currentBook=null, isFullAccess=false, purchasedBooks={}, readerFontSize=18;
+var pdfDoc=null, pdfScale=1.0, pdfRenderToken=0, currentPdfText='';
 var audioPlaying=false, audioInterval=null, currentUtterance=null, audioWords=[];
 var synth=window.speechSynthesis;
 
@@ -131,19 +132,29 @@ function openReader(book, full) {
   isFullAccess = full || !!purchasedBooks[book.id];
   var rt = document.getElementById('r-title');
   if(rt) rt.textContent = book.title + ' \u2014 ' + book.author;
+
+  // Contents sidebar — informational in PDF mode. Locked chapters prompt purchase.
   var tl = document.getElementById('toc-list');
   if(tl) {
     var html = '';
-    book.chapters.forEach(function(ch, i) {
+    (book.chapters || []).forEach(function(ch, i) {
       var locked = !isFullAccess && i > 0;
-      html += '<button class="toc-btn' + (locked?' locked':'') + (i===0?' active':'') + '"'
-        + ' onclick="' + (locked ? 'openCheckout(currentBook)' : 'readChapter('+i+')') + '">'
+      html += '<button class="toc-btn' + (locked ? ' locked' : '') + (i === 0 ? ' active' : '') + '"'
+        + ' onclick="' + (locked ? 'openCheckout(currentBook)' : 'scrollReaderTop()') + '">'
         + ch.title + (locked ? '<span class="toc-lock">&#128274;</span>' : '')
         + '</button>';
     });
+    if(!isFullAccess) {
+      html += '<div class="toc-note">Showing the Chapter 1 preview. Unlock to read the full book as a PDF.</div>';
+    }
     tl.innerHTML = html;
   }
-  readChapter(0);
+
+  // Owners read the full PDF; everyone else sees the Chapter 1 preview PDF.
+  var src = isFullAccess ? book.pdf : book.preview;
+  pdfScale = 1.0;
+  loadPdf(src, book);
+
   showView('reader');
   var dl = document.getElementById('dl-btn');
   if(dl) dl.style.opacity = isFullAccess ? '1' : '0.4';
@@ -151,122 +162,149 @@ function openReader(book, full) {
 
 function openReaderAudio() { openReader(currentBook, true); setTimeout(toggleAudio, 400); }
 
-function readChapter(idx) {
-  var book = currentBook;
-  if(!book) return;
-  var ch = book.chapters[idx];
-  // Only chapter 0 is free; everything else requires purchase
-  var locked = !isFullAccess && idx > 0;
-  document.querySelectorAll('.toc-btn').forEach(function(b, i){ b.classList.toggle('active', i===idx); });
-  var pf = document.getElementById('r-progress');
-  if(pf) pf.style.width = Math.round((idx+1)/book.chapters.length*100) + '%';
-  if(locked){ openCheckout(book); return; }
+function scrollReaderTop() {
+  var s = document.querySelector('.reader-scroll');
+  if(s) s.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  // Get text — only ch1 is shown free
-  var rawText = idx === 0 ? (book.ch1||'') : (book['ch'+(idx+1)]||'');
-
-  // Split into readable paragraphs (80-100 words each)
-  var paras = [];
-  if(rawText) {
-    var words = rawText.split(/\s+/);
-    var para = '';
-    var wcount = 0;
-    words.forEach(function(w) {
-      if(!w) return;
-      para += w + ' ';
-      wcount++;
-      // Break on sentence end near 80+ words, or hard break at 120
-      var endsWithPunct = /[.!?]\s*$/.test(para.trim());
-      if(wcount >= 80 && endsWithPunct || wcount >= 120) {
-        paras.push(para.trim());
-        para = '';
-        wcount = 0;
-      }
-    });
-    if(para.trim()) paras.push(para.trim());
-  } else {
-    paras = ['Chapter text loads from the secure server after purchase. You have full access to this book.'];
-  }
-
-  // Build PDF-style document reader
-  var html = '';
-  html += '<div class="pdf-chapter-header">';
-  html += '<div class="pdf-chapter-label">Chapter ' + (idx+1) + '</div>';
-  html += '<div class="pdf-chapter-title">' + ch.title + '</div>';
-  html += '<div class="pdf-chapter-book">' + book.title + '</div>';
-  html += '<div class="pdf-chapter-rule"></div>';
-  html += '</div>';
-
-  html += '<div class="pdf-pages">';
-
-  var isFirstPara = true;
-  var currentPageParas = [];
-  var pageCount = 0;
-  var parasPerPage = 4;
-
-  // Group into "pages"
-  for(var pi = 0; pi < paras.length; pi += parasPerPage) {
-    var pageParagraphs = paras.slice(pi, pi + parasPerPage);
-    pageCount++;
-    html += '<div class="pdf-page">';
-    html += '<div class="pdf-page-content">';
-    pageParagraphs.forEach(function(p, li) {
-      var isFirst = (pi === 0 && li === 0);
-      html += '<p class="pdf-para' + (isFirst ? ' pdf-dropcap' : '') + '" style="font-size:' + readerFontSize + 'px">';
-      if(isFirst) {
-        // Drop cap on first letter
-        var first = p.charAt(0);
-        var rest = p.slice(1);
-        html += '<span class="dropcap">' + first + '</span>' + rest;
-      } else {
-        html += p;
-      }
-      html += '</p>';
-    });
-    html += '</div>';
-    html += '<div class="pdf-page-num">' + (pi/parasPerPage + 1) + '</div>';
-    html += '</div>';
-  }
-
-  html += '</div>';
-
-  // Paywall after ch1 if not purchased
-  if(!isFullAccess && idx === 0) {
-    html += '<div class="paywall-zone">';
-    html += '<div class="paywall-fade"><div class="paywall-card">';
-    html += '<span class="pw-icon">&#128218;</span>';
-    html += '<div class="pw-title">End of free preview</div>';
-    html += '<p class="pw-desc">You have finished Chapter 1. Unlock the full book to continue reading every chapter, download the PDF, and listen with AI narration.</p>';
-    html += '<div class="pw-price">' + book.currency + ' ' + book.price + '</div>';
-    html += '<div class="pw-sub">One-time payment &middot; Full access &middot; PDF + AI Audio included</div>';
-    html += '<button class="btn-purchase" onclick="openCheckout(currentBook)">Unlock Full Book &mdash; ' + book.currency + ' ' + book.price + '</button>';
-    html += '</div></div>';
-    html += '</div>';
-  }
-
+// ---------- PDF viewer (renders the actual PDF inline via PDF.js) ----------
+function loadPdf(src, book) {
   var rc = document.getElementById('reader-content');
-  if(rc) rc.innerHTML = html;
-  audioWords = paras.join(' ').split(' ').filter(function(w){ return w.length > 0; });
+  if(!rc) return;
+  rc.classList.add('pdf-mode');
+  pdfRenderToken++;
+  var token = pdfRenderToken;
+  pdfDoc = null;
+  currentPdfText = '';
+  audioWords = [];
   stopAudio();
+  rc.innerHTML = '<div class="pdf-loading"><div class="pdf-spinner"></div>'
+    + '<div class="pdf-loading-txt">Opening ' + book.title + '\u2026</div></div>';
+
+  if(typeof pdfjsLib === 'undefined') {
+    rc.innerHTML = pdfFallbackHtml(book, 'lib');
+    return;
+  }
+
+  pdfjsLib.getDocument(src).promise.then(function(doc) {
+    if(token !== pdfRenderToken) return; // a newer load superseded this one
+    pdfDoc = doc;
+    rc.innerHTML = '<div id="pdf-viewer"></div>';
+    renderAllPages(doc, token, book);
+    extractPdfText(doc, token);
+  }).catch(function() {
+    if(token !== pdfRenderToken) return;
+    rc.innerHTML = pdfFallbackHtml(book, isFullAccess ? 'full' : 'preview');
+  });
+}
+
+function renderAllPages(doc, token, book) {
+  var viewer = document.getElementById('pdf-viewer');
+  if(!viewer) return;
+  var dpr = window.devicePixelRatio || 1;
+  var containerW = viewer.clientWidth || 700;
+  updateReaderProgress(0);
+
+  function renderPage(num) {
+    if(token !== pdfRenderToken) return;
+    doc.getPage(num).then(function(page) {
+      if(token !== pdfRenderToken) return;
+      var base = page.getViewport({ scale: 1 });
+      var fit = Math.min((containerW - 8) / base.width, 1.7); // fit width, cap upscaling
+      var viewport = page.getViewport({ scale: fit * pdfScale * dpr });
+      var canvas = document.createElement('canvas');
+      canvas.className = 'pdf-canvas-page';
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.width = (viewport.width / dpr) + 'px';
+      viewer.appendChild(canvas);
+      page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise.then(function() {
+        if(token !== pdfRenderToken) return;
+        if(num < doc.numPages) renderPage(num + 1);
+        else if(!isFullAccess) appendPaywall(book);
+      });
+    });
+  }
+  renderPage(1);
+}
+
+function appendPaywall(book) {
+  var viewer = document.getElementById('pdf-viewer');
+  if(!viewer) return;
+  var d = document.createElement('div');
+  d.className = 'paywall-card pdf-paywall';
+  d.innerHTML = '<span class="pw-icon">&#128218;</span>'
+    + '<div class="pw-title">End of free preview</div>'
+    + '<p class="pw-desc">You\u2019ve reached the end of Chapter 1. Unlock the full book to read every page as a PDF, download it, and listen with AI narration.</p>'
+    + '<div class="pw-price">' + book.currency + ' ' + book.price + '</div>'
+    + '<div class="pw-sub">One-time payment &middot; Full access &middot; PDF + AI Audio included</div>'
+    + '<button class="btn-purchase" onclick="openCheckout(currentBook)">Unlock Full Book &mdash; ' + book.currency + ' ' + book.price + '</button>';
+  viewer.appendChild(d);
+}
+
+function pdfFallbackHtml(book, mode) {
+  var msg;
+  if(mode === 'full') msg = 'The full edition of this book is being uploaded and will appear here shortly.';
+  else if(mode === 'preview') msg = 'The Chapter 1 preview for this book is being prepared and will appear here shortly.';
+  else msg = 'The PDF viewer is still loading. Please refresh the page and try again.';
+  return '<div class="pdf-fallback"><span class="pw-icon">&#128216;</span>'
+    + '<div class="pw-title">' + book.title + '</div>'
+    + '<p class="pw-desc">' + msg + '</p>'
+    + '<button class="btn-preview" onclick="showDetail(currentBook.id)">&larr; Back to book details</button>'
+    + '</div>';
+}
+
+// Pull text out of the rendered PDF so AI audio narration still works.
+function extractPdfText(doc, token) {
+  var n = Math.min(doc.numPages, 40);
+  var pages = [];
+  var done = 0;
+  for(var i = 1; i <= n; i++) {
+    (function(p) {
+      doc.getPage(p).then(function(page) { return page.getTextContent(); })
+        .then(function(tc) {
+          pages[p] = tc.items.map(function(it) { return it.str; }).join(' ');
+          finish();
+        }).catch(function() { finish(); });
+    })(i);
+  }
+  function finish() {
+    done++;
+    if(done < n || token !== pdfRenderToken) return;
+    currentPdfText = pages.join(' ').replace(/\s+/g, ' ').trim();
+    audioWords = currentPdfText.split(' ').filter(function(w) { return w.length > 0; });
+    if(audioWords.length === 0 && currentBook) {
+      audioWords = (currentBook.ch1 || '').split(/\s+/).filter(function(w) { return w.length > 0; });
+    }
+  }
+}
+
+function updateReaderProgress(pct) {
+  var pf = document.getElementById('r-progress');
+  if(pf) pf.style.width = Math.round(pct) + '%';
 }
 
 
 function changeFontSize(d) {
-  readerFontSize = Math.max(14, Math.min(26, readerFontSize + d));
-  // Target both old rpara class and new pdf-para class
-  document.querySelectorAll('.rpara, .pdf-para').forEach(function(p){
-    p.style.fontSize = readerFontSize + 'px';
-  });
-  // Also update line-height on pdf-pages for readability
-  document.querySelectorAll('.pdf-page-content').forEach(function(el){
-    el.style.lineHeight = readerFontSize > 20 ? '2.2' : '2';
-  });
+  // In PDF mode the A+/A- buttons zoom the document in and out.
+  pdfScale = Math.max(0.7, Math.min(2.2, pdfScale + d * 0.15));
+  if(pdfDoc && currentBook) {
+    var viewer = document.getElementById('pdf-viewer');
+    if(viewer) viewer.innerHTML = '';
+    renderAllPages(pdfDoc, pdfRenderToken, currentBook);
+  }
 }
 
 function handleDownload() {
   if(!currentBook) return;
   if(!purchasedBooks[currentBook.id]){ openCheckout(currentBook); return; }
-  alert('Downloading "' + currentBook.title + '.pdf"\nIn production this links to the secure PDF on the server.');
+  // Owner — trigger a real download of the book PDF served from /books.
+  var a = document.createElement('a');
+  a.href = currentBook.pdf;
+  a.download = currentBook.id + '.pdf';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function toggleAudio() {
@@ -440,5 +478,17 @@ function completeCheckout() {
 
 document.getElementById('checkout-modal').addEventListener('click', function(e){ if(e.target===this) closeCheckout(); });
 if(synth) synth.onvoiceschanged = function(){};
+
+// Update the reader progress bar as the PDF is scrolled.
+(function(){
+  var scroll = document.querySelector('.reader-scroll');
+  if(scroll){
+    scroll.addEventListener('scroll', function(){
+      var max = scroll.scrollHeight - scroll.clientHeight;
+      updateReaderProgress(max > 0 ? (scroll.scrollTop / max * 100) : 0);
+    });
+  }
+})();
+
 populateHome();
 populateBrowse();
