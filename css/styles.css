@@ -249,3 +249,18 @@ footer{border-top:1px solid var(--bords);padding:40px;display:flex;justify-conte
   .mylib-content{padding:50px 20px 60px;}
   footer{padding:32px 20px;flex-direction:column;text-align:center;}
 }
+
+/* ---------- PDF viewer (actual inline PDF rendering) ---------- */
+.reader-content.pdf-mode{max-width:none;padding:24px 16px 80px;}
+#pdf-viewer{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.pdf-canvas-page{max-width:100%;border:1px solid var(--bords);border-radius:2px;box-shadow:0 4px 24px rgba(0,0,0,0.45);background:#F4F1EA;}
+.pdf-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:90px 20px;color:var(--muted);font-family:"DM Sans",sans-serif;font-size:14px;}
+.pdf-loading-txt{letter-spacing:.5px;}
+.pdf-spinner{width:34px;height:34px;border:3px solid var(--ob4);border-top-color:var(--gold);border-radius:50%;animation:pdfspin .8s linear infinite;}
+@keyframes pdfspin{to{transform:rotate(360deg);}}
+.pdf-fallback{max-width:420px;margin:70px auto;text-align:center;background:var(--ob2);border:1px solid var(--bord);border-radius:6px;padding:36px 30px;}
+.pdf-fallback .pw-icon{font-size:30px;display:block;margin-bottom:14px;}
+.pdf-fallback .pw-title{font-family:"Playfair Display",serif;font-size:20px;color:var(--parch);margin-bottom:10px;}
+.pdf-fallback .pw-desc{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px;}
+.pdf-paywall{margin:26px auto 10px;max-width:420px;}
+.toc-note{margin-top:18px;padding-top:14px;border-top:1px solid var(--bords);font-family:"DM Sans",sans-serif;font-size:11px;line-height:1.6;color:var(--muted);}
